@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boredom Rx | Personalized Solutions</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --accent: #10b981;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 { color: var(--primary); margin-top: 0; }
+        p.subtitle { color: #64748b; margin-bottom: 2rem; }
+
+        /* Type Selector Styling */
+        .type-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .type-chip {
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            background: none;
+        }
+
+        .type-chip:hover { border-color: var(--primary); color: var(--primary); }
+        .type-chip.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+        /* Medical Info Box */
+        #medical-box {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            display: none; /* Hidden until a type is selected */
+            border-left: 4px solid var(--accent);
+            text-align: left;
+        }
+
+        /* The Big Activity Display */
+        #activity-display {
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            color: var(--text);
+            background: #fff;
+        }
+
+        button.main-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        button.main-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        }
+
+        button.main-btn:active { transform: scale(0.98); }
+        
+        button.main-btn:disabled { background-color: #cbd5e1; cursor: not-allowed; box-shadow: none; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Boredom Rx</h1>
+    <p class="subtitle">Select your mood & get a custom cure.</p>
+
+    <div class="type-selector" id="selector">
+        <button class="type-chip" onclick="setType('indifferent', this)">Relaxed</button>
+        <button class="type-chip" onclick="setType('calibrating', this)">Wandering</button>
+        <button class="type-chip" onclick="setType('searching', this)">Restless</button>
+        <button class="type-chip" onclick="setType('reactant', this)">Frustrated</button>
+        <button class="type-chip" onclick="setType('apathetic', this)">Empty</button>
+    </div>
+
+    <div id="medical-box">
+        <strong>Medical Insight:</strong> <span id="medical-text"></span>
+    </div>
+
+    <div id="activity-display">
+        Select a type above to begin
+    </div>
+
+    <button class="main-btn" id="solve-btn" disabled onclick="generateIdea()">Find a Solution</button>
+</div>
+
+<script>
+    const boredomData = {
+        indifferent: {
+            medical: "Low arousal state. Your brain is in 'incubation mode,' which is highly beneficial for subconscious problem-solving.",
+            ideas: ["Stare out the window for 5 mins", "Listen to one full album without a phone", "Doodle on a napkin", "Practice deep breathing"]
+        },
+        calibrating: {
+            medical: "The 'Optimal Arousal' search. Your brain is slightly under-stimulated and is looking for a task that matches your current skill level.",
+            ideas: ["Organize your phone apps", "Learn a 30-second card trick", "Write a haiku", "Read a long-form article on a new topic"]
+        },
+        searching: {
+            medical: "High arousal restlessness. Cortisol levels may be slightly elevated as you seek high-dopamine rewards.",
+            ideas: ["Go for a sprint", "Clean your entire kitchen", "Try a high-intensity 5-min workout", "Start a fast-paced video game"]
+        },
+        reactant: {
+            medical: "The 'Flight or Fight' boredom. Often caused by a lack of autonomy. You feel trapped, leading to potential irritability.",
+            ideas: ["Journal your frustrations", "Rearrange your furniture", "Go for a drive or a long walk", "Throw away 10 things you don't need"]
+        },
+        apathetic: {
+            medical: "Close to learned helplessness. Characterized by low energy and negative affect. Small 'micro-wins' are needed to restart the reward system.",
+            ideas: ["Drink a glass of cold water", "Step outside for 2 mins", "Text a friend a meme", "Wash just three dishes"]
+        }
+    };
+
+    let selectedType = null;
+
+    function setType(type, element) {
+        selectedType = type;
+        
+        // UI Updates
+        document.querySelectorAll('.type-chip').forEach(c => c.classList.remove('active'));
+        element.classList.add('active');
+        
+        const medBox = document.getElementById('medical-box');
+        const medText = document.getElementById('medical-text');
+        const btn = document.getElementById('solve-btn');
+        
+        medBox.style.display = 'block';
+        medText.innerText = boredomData[type].medical;
+        btn.disabled = false;
+        
+        // Prompt user to click the big button
+        document.getElementById('activity-display').innerText = "Now, get your solution!";
+    }
+
+    function generateIdea() {
+        if (!selectedType) return;
+        
+        const display = document.getElementById('activity-display');
+        const options = boredomData[selectedType].ideas;
+        
+        // Add a little "loading" feel
+        display.style.opacity = 0;
+        
+        setTimeout(() => {
+            const randomIdea = options[Math.floor(Math.random() * options.length)];
+            display.innerText = randomIdea;
+            display.style.opacity = 1;
+        }, 150);
+    }
+</script>
+
+</body>
+</html>
